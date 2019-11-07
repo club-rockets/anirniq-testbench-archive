@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
-
+#include "app_sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,18 +48,37 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-osThreadId_t defaultTaskHandle;
-osThreadId_t tskHeartbeatHandle;
+osThreadId defaultTaskHandle;
+osThreadId tskHeartbeatHandle;
+osThreadId app_SDHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
    
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument); // for v2
-extern void app_heartbeat(void *argument); // for v2
+void StartDefaultTask(void const * argument);
+extern void app_heartbeat(void const * argument);
+extern void tsk_SD(void const * argument);
 
+extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* GetIdleTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+
+/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+static StaticTask_t xIdleTaskTCBBuffer;
+static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+  
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+{
+  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  /* place for user code */
+}                   
+/* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /**
   * @brief  FreeRTOS initialization
@@ -70,7 +89,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
        
   /* USER CODE END Init */
-osKernelInitialize(); // Initialize CMSIS-RTOS
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -90,20 +108,16 @@ osKernelInitialize(); // Initialize CMSIS-RTOS
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  const osThreadAttr_t defaultTask_attributes = {
-    .name = "defaultTask",
-    .priority = (osPriority_t) osPriorityLow3,
-    .stack_size = 128
-  };
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityLow, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of tskHeartbeat */
-  const osThreadAttr_t tskHeartbeat_attributes = {
-    .name = "tskHeartbeat",
-    .priority = (osPriority_t) osPriorityLow,
-    .stack_size = 128
-  };
-  tskHeartbeatHandle = osThreadNew(app_heartbeat, NULL, &tskHeartbeat_attributes);
+  osThreadDef(tskHeartbeat, app_heartbeat, osPriorityLow, 0, 128);
+  tskHeartbeatHandle = osThreadCreate(osThread(tskHeartbeat), NULL);
+
+  /* definition and creation of app_SD */
+  osThreadDef(app_SD, tsk_SD, osPriorityNormal, 0, 1000);
+  app_SDHandle = osThreadCreate(osThread(app_SD), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -118,8 +132,10 @@ osKernelInitialize(); // Initialize CMSIS-RTOS
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+void StartDefaultTask(void const * argument)
 {
+  /* init code for FATFS */
+  MX_FATFS_Init();
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
