@@ -5,7 +5,7 @@
 #include "app_heartbeat.h"
 
 
-void app_heartbeat(void*arg)
+void app_blink(void*arg)
 {
 //	osDelay(300000);
 //	EjectDrogue();

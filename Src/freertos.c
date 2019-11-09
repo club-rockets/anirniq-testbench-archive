@@ -49,7 +49,7 @@
 
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
-osThreadId tskHeartbeatHandle;
+osThreadId tskBlinkHandle;
 osThreadId app_SDHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,7 +58,7 @@ osThreadId app_SDHandle;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
-extern void app_heartbeat(void const * argument);
+extern void app_blink(void const * argument);
 extern void tsk_SD(void const * argument);
 
 extern void MX_FATFS_Init(void);
@@ -111,9 +111,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityLow, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  /* definition and creation of tskHeartbeat */
-  osThreadDef(tskHeartbeat, app_heartbeat, osPriorityLow, 0, 128);
-  tskHeartbeatHandle = osThreadCreate(osThread(tskHeartbeat), NULL);
+  /* definition and creation of tskBlink */
+  osThreadDef(tskBlink, app_blink, osPriorityLow, 0, 128);
+  tskBlinkHandle = osThreadCreate(osThread(tskBlink), NULL);
 
   /* definition and creation of app_SD */
   osThreadDef(app_SD, tsk_SD, osPriorityNormal, 0, 1000);
