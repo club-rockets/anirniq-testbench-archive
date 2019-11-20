@@ -28,7 +28,7 @@ uint8_t sd_sendCommand(uint8_t cmd,uint32_t arg){
 	cmdBuff[2] = arg>>16;
 	cmdBuff[3] = arg>>8;
 	cmdBuff[4] = arg;
-	cmdBuff[5] = 0;
+	cmdBuff[5] = 0x01;
 
 	if(cmd == CMD0){
 		cmdBuff[5] = 0x95;
@@ -78,8 +78,8 @@ DSTATUS sd_powerOn(uint8_t diskNo){
 
 	//set the spi to full speed to reduce latency
 
-	hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
-	HAL_SPI_Init(&hspi2);
+	//hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+	//HAL_SPI_Init(&hspi2);
 
 return 0;
 }
@@ -128,13 +128,12 @@ DSTATUS sd_initialize(uint8_t diskNo){
 		//read ccs bit
 		if(ffBuffer[0] & (1<<6)){
 			sdCardtype = sdBlock;
-			//force lba size to 512 bytes
-			if(sd_sendCommand(CMD16,0x200) == 0){
-				cardStatus = initialised;
-			}
-
 		}
 		else{
+			//force lba size to 512 bytes
+//			if(sd_sendCommand(CMD16,0x200) == 0){
+//				cardStatus = initialised;
+//			}
 			sdCardtype = sdByte;
 			cardStatus = initialised;
 		}
@@ -164,7 +163,7 @@ uint32_t sd_readLba(uint8_t* buff,uint32_t lbano){
 	uint8_t cmdBuff[6] = {0};
 	uint32_t trycounter = 0;
 	//wait for valid data token 0xfe;
-	trycounter = 10000;
+	trycounter = 1000;
 	do{
 		HAL_SPI_Receive_DMA(&hspi2,cmdBuff,1);
 		osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
@@ -180,6 +179,9 @@ uint32_t sd_readLba(uint8_t* buff,uint32_t lbano){
 
 DRESULT sd_read(uint8_t diskno,uint8_t* buff,uint32_t sector,uint32_t lbano){
 
+	uint8_t b = 0;
+	uint32_t trycounter;
+
 	if(sdCardtype == sdByte){
 		sector*=512;
 	}
@@ -188,11 +190,14 @@ DRESULT sd_read(uint8_t diskno,uint8_t* buff,uint32_t sector,uint32_t lbano){
 
 	if(lbano == 1){
 		//cmd15, single block read
-		if(sd_sendCommand(CMD17,sector) == 0){
-
-			sd_readLba(buff,lbano);
-			//HAL_SPI_Receive_DMA(&hspi2,buff,512);
-			//osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+		if(sd_sendCommand(CMD17,0) == 0){
+			trycounter = 100;
+			//sd_readLba(buff,lbano);
+			do{
+				HAL_SPI_Receive_DMA(&hspi2,&b,1);
+				osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+				trycounter--;
+				}while(trycounter && (b == 0xff));
 		}
 		else{
 			SD_DESELECT();
