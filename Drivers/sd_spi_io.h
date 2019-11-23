@@ -16,6 +16,7 @@
 #define CMD9     (0x40+9)     /* SEND_CSD */
 #define CMD10    (0x40+10)    /* SEND_CID */
 #define CMD12    (0x40+12)    /* STOP_TRANSMISSION */
+#define CMD13    (0x40+13)    /* SEND STATUS*/
 #define CMD16    (0x40+16)    /* SET_BLOCKLEN */
 #define CMD17    (0x40+17)    /* READ_SINGLE_BLOCK */
 #define CMD18    (0x40+18)    /* READ_MULTIPLE_BLOCK */

@@ -12,14 +12,16 @@
 #include"sd_spi_io.h"
 
 
-uint8_t lbaBuff[512] = {0};
+uint8_t lbaBuff[512] = {0xaa};
 
 void tsk_disk(void const * argument){
 
 
 	sd_initialize(0);
 
-	sd_read(0,lbaBuff,1<<9,1);
+	sd_write(0,lbaBuff,0,1);
+
+	sd_read(0,lbaBuff,0,1);
 
 	while(1){
 		osDelay(100);

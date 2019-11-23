@@ -21,6 +21,13 @@ enum{noCard,uninitialised,initialised} cardStatus = uninitialised;
 
 //osSignalWait(ACC_TRANSFER_CPLT_SIGNAL,osWaitForever);
 
+uint8_t sd_readByte(){
+	uint8_t b;
+	HAL_SPI_Receive_DMA(&hspi2,&b,1);
+	osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+	return b;
+}
+
 uint8_t sd_sendCommand(uint8_t cmd,uint32_t arg){
 	uint8_t cmdBuff[6];
 	cmdBuff[0] = cmd;
@@ -159,27 +166,66 @@ DSTATUS sd_status(uint8_t diskNo){
 	return 0;
 }
 
+uint32_t sd_waitBuzy(){
+	uint8_t b = 0;
+	uint32_t trycounter = 10000;
+	do{
+			HAL_SPI_Receive_DMA(&hspi2,&b,1);
+			osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+			trycounter--;
+			}while(trycounter && (b != 0xff));
+	return b;
+}
+
 uint32_t sd_readLba(uint8_t* buff,uint32_t lbano){
-	uint8_t cmdBuff[6] = {0};
+	uint8_t b[2];
 	uint32_t trycounter = 0;
 	//wait for valid data token 0xfe;
 	trycounter = 1000;
 	do{
-		HAL_SPI_Receive_DMA(&hspi2,cmdBuff,1);
+		HAL_SPI_Receive_DMA(&hspi2,b,1);
 		osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
 		trycounter--;
-		}while(trycounter && (cmdBuff[0] == 0xff));
+		}while(trycounter && (b[0] == 0xff));
 
-	if(cmdBuff[0] == 0xfe){
-		osDelay(100);
+	if(b[0] == 0xfe){
+		HAL_SPI_Receive_DMA(&hspi2,buff,512);
+		osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+		HAL_SPI_Receive_DMA(&hspi2,b,2);
+		osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+		return 1;
 	}
+	return 0;
+}
 
-	return 1;
+uint32_t sd_writeLba(uint8_t* buff,uint32_t lbano){
+	uint8_t b[2] = {0};
+	uint32_t trycounter = 0;
+
+	trycounter = 1000;
+	b[0] = 0xfe;
+	HAL_SPI_Transmit_DMA(&hspi2,b,1);
+	osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+	HAL_SPI_Transmit_DMA(&hspi2,buff,512);
+	osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+	b[0] = 0;
+	HAL_SPI_Receive_DMA(&hspi2,b,2);
+	osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+	do{
+		HAL_SPI_Receive_DMA(&hspi2,b,1);
+		osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+		trycounter--;
+		}while(trycounter && (b[0] == 0xff));
+
+	if((b[0] & 0x1f) == 0x05){
+		while(sd_readByte() != 0xff);
+		return 1;
+	}
+	return 0;
 }
 
 DRESULT sd_read(uint8_t diskno,uint8_t* buff,uint32_t sector,uint32_t lbano){
 
-	uint8_t b = 0;
 	uint32_t trycounter;
 
 	if(sdCardtype == sdByte){
@@ -188,17 +234,25 @@ DRESULT sd_read(uint8_t diskno,uint8_t* buff,uint32_t sector,uint32_t lbano){
 
 	SD_SELECT();
 
+	if(!sd_waitBuzy()){
+		SD_DESELECT();
+		return RES_ERROR;
+	}
+
 	if(lbano == 1){
 		//cmd15, single block read
-		if(sd_sendCommand(CMD17,0) == 0){
-			trycounter = 100;
-			//sd_readLba(buff,lbano);
-			do{
-				HAL_SPI_Receive_DMA(&hspi2,&b,1);
-				osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
-				trycounter--;
-				}while(trycounter && (b == 0xff));
+		if(sd_sendCommand(CMD17,sector) == 0){
+			if(sd_readLba(buff,1)){
+				SD_DESELECT();
+				return RES_OK;
+			}
 		}
+		else if(sd_sendCommand(CMD17,sector) == 0){
+					if(sd_readLba(buff,1)){
+						SD_DESELECT();
+						return RES_OK;
+					}
+				}
 		else{
 			SD_DESELECT();
 			return RES_ERROR;
@@ -214,14 +268,23 @@ DRESULT sd_read(uint8_t diskno,uint8_t* buff,uint32_t sector,uint32_t lbano){
 }
 
 DRESULT sd_write(uint8_t diskno,uint8_t* buff,uint32_t sector,uint32_t lbano){
+	SD_SELECT();
+	uint8_t b;
+	volatile uint16_t statusReg = 0;
 	if(sdCardtype == sdByte){
 		sector*=512;
 	}
 
 	if(lbano == 1){
 		if(sd_sendCommand(CMD24,sector) == 0){
-			HAL_SPI_Transmit_DMA(&hspi2,buff,512);
-			osSignalWait(SD_TRANSFER_CPLT_SIGNAL,osWaitForever);
+			if(sd_writeLba(buff,1)){
+//				statusReg = sd_sendCommand(CMD13,0);
+//				statusReg<<=8;
+//				statusReg |= sd_readByte();
+				SD_DESELECT();
+				sd_readByte();
+				return RES_OK;
+			}
 		}
 	}
 	else{
@@ -229,5 +292,5 @@ DRESULT sd_write(uint8_t diskno,uint8_t* buff,uint32_t sector,uint32_t lbano){
 		return RES_ERROR;
 	}
 
-return RES_OK;
+	return RES_ERROR;
 }
