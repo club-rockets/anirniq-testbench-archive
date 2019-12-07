@@ -22,9 +22,6 @@
 
 /* USER CODE BEGIN 0 */
 
-#include "cmsis_os.h"
-#include "sd_spi_io.h"
-
 /* USER CODE END 0 */
 
 SPI_HandleTypeDef hspi2;
@@ -157,23 +154,6 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
 
 /* USER CODE BEGIN 1 */
 
-extern osThreadId diskioHandle;
-
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
-	if(hspi == &hspi2){
-		//xSemaphoreGiveFromISR(sdSemaphoreHandle,0);
-		osSignalSet(diskioHandle,SD_TRANSFER_CPLT_SIGNAL);
-	}
-
-}
-void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi){
-	if(hspi == &hspi2){
-		//xSemaphoreGiveFromISR(sdSemaphoreHandle,0);
-		osSignalSet(diskioHandle,SD_TRANSFER_CPLT_SIGNAL);
-
-	}
-
-}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
