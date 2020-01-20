@@ -7,7 +7,6 @@
 #include "diskio.h"
 #include "fatfs_sd.h"
 
-#include "app_disc.h"
 #include "cmsis_os.h"
 
 #define SD_TRANSFER_CPLT_SIGNAL (1<<0)
