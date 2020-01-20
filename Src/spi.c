@@ -63,21 +63,13 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
     /* SPI2 clock enable */
     __HAL_RCC_SPI2_CLK_ENABLE();
   
-    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**SPI2 GPIO Configuration    
-    PC2     ------> SPI2_MISO
     PB13     ------> SPI2_SCK
+    PB14     ------> SPI2_MISO
     PB15     ------> SPI2_MOSI 
     */
-    GPIO_InitStruct.Pin = SD_MISO_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
-    HAL_GPIO_Init(SD_MISO_GPIO_Port, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = SD_CLK_Pin|SD_MOSI_Pin;
+    GPIO_InitStruct.Pin = SD_CLK_Pin|SD_MISO_Pin|SD_MOSI_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -142,13 +134,11 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
     __HAL_RCC_SPI2_CLK_DISABLE();
   
     /**SPI2 GPIO Configuration    
-    PC2     ------> SPI2_MISO
     PB13     ------> SPI2_SCK
+    PB14     ------> SPI2_MISO
     PB15     ------> SPI2_MOSI 
     */
-    HAL_GPIO_DeInit(SD_MISO_GPIO_Port, SD_MISO_Pin);
-
-    HAL_GPIO_DeInit(GPIOB, SD_CLK_Pin|SD_MOSI_Pin);
+    HAL_GPIO_DeInit(GPIOB, SD_CLK_Pin|SD_MISO_Pin|SD_MOSI_Pin);
 
     /* SPI2 DMA DeInit */
     HAL_DMA_DeInit(spiHandle->hdmarx);
