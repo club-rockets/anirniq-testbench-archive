@@ -51,6 +51,7 @@
 osThreadId defaultTaskHandle;
 osThreadId tskBlinkHandle;
 osThreadId app_SDHandle;
+osThreadId lcdHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -60,6 +61,7 @@ osThreadId app_SDHandle;
 void StartDefaultTask(void const * argument);
 extern void app_blink(void const * argument);
 extern void tsk_SD(void const * argument);
+extern void tsk_lcd(void const * argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -118,6 +120,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of app_SD */
   osThreadDef(app_SD, tsk_SD, osPriorityNormal, 0, 1000);
   app_SDHandle = osThreadCreate(osThread(app_SD), NULL);
+
+  /* definition and creation of lcd */
+  osThreadDef(lcd, tsk_lcd, osPriorityIdle, 0, 500);
+  lcdHandle = osThreadCreate(osThread(lcd), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
