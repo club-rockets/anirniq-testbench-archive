@@ -71,12 +71,26 @@ void Error_Handler(void);
 #define SD_MISO_GPIO_Port GPIOB
 #define SD_MOSI_Pin GPIO_PIN_15
 #define SD_MOSI_GPIO_Port GPIOB
+#define LCD_D4_Pin GPIO_PIN_8
+#define LCD_D4_GPIO_Port GPIOD
+#define LCD_D5_Pin GPIO_PIN_9
+#define LCD_D5_GPIO_Port GPIOD
+#define LCD_D6_Pin GPIO_PIN_10
+#define LCD_D6_GPIO_Port GPIOD
+#define LCD_D7_Pin GPIO_PIN_11
+#define LCD_D7_GPIO_Port GPIOD
 #define LD4_Pin GPIO_PIN_15
 #define LD4_GPIO_Port GPIOD
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
 #define SWCLK_GPIO_Port GPIOA
+#define LCD_E_Pin GPIO_PIN_3
+#define LCD_E_GPIO_Port GPIOD
+#define LCD_RS_Pin GPIO_PIN_6
+#define LCD_RS_GPIO_Port GPIOD
+#define LCD_RW_Pin GPIO_PIN_7
+#define LCD_RW_GPIO_Port GPIOD
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */

@@ -29,7 +29,40 @@ void lcd_init(lcd_struct_t* lcd){
 		lcd_write(lcd,lcd_command,0b00000001);
 		HAL_Delay(50);
 	}
+	else{
+		lcd->interfaceSize = lcd_size8;
+		// setup sequence for 8 bit bus
+		lcd_write(lcd,lcd_command,0b00110000);
+		HAL_Delay(10);
+		lcd_write(lcd,lcd_command,0b00110000);
+		HAL_Delay(10);
+		lcd_write(lcd,lcd_command,0b00110000);
+		HAL_Delay(10);
+		//display on and cursor and blinking cursor
+		lcd_write(lcd,lcd_command,0b00001111);
+		HAL_Delay(10);
 
+		lcd_write(lcd,lcd_command,0b00000110);
+		HAL_Delay(50);
+		lcd_write(lcd,lcd_command,0b00000001);
+		HAL_Delay(50);
+	}
+}
+
+void lcd_setMode(lcd_struct_t* lcd, uint32_t onOff,uint32_t blink, uint32_t cursor){
+
+	uint8_t cmd = 0b00001000;
+	//on/off
+	if(onOff){
+		cmd |= 1<<2;
+	}
+	if(blink){
+		cmd |= 1<<0;
+	}
+	if(cursor){
+		cmd |= 1<<1;
+	}
+	lcd_write(lcd,lcd_command,cmd);
 }
 
 
@@ -103,4 +136,16 @@ void lcd_setCursor(lcd_struct_t* lcd,uint8_t x,uint8_t y){
 	}
 	poss +=x;
 	lcd_write(lcd,lcd_command,0b10000000 | poss);
+}
+
+void lcd_clear(lcd_struct_t* lcd){
+	lcd_write(lcd,lcd_command,0x01);
+	osDelay(50);
+}
+
+void lcd_writeString(lcd_struct_t* lcd,uint8_t* str){
+	uint32_t i = 0;
+	for(;str[i];i++){
+		lcd_write(lcd,lcd_data,str[i]);
+	}
 }
