@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lcd.h"
+#include "cmsis_os.h"
 
 void lcd_init(lcd_struct_t* lcd){
 

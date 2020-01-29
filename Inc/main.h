@@ -59,6 +59,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define loadcell_data_Pin GPIO_PIN_4
+#define loadcell_data_GPIO_Port GPIOE
+#define loadcell_clk_Pin GPIO_PIN_6
+#define loadcell_clk_GPIO_Port GPIOE
 #define PH1_OSC_OUT_Pin GPIO_PIN_1
 #define PH1_OSC_OUT_GPIO_Port GPIOH
 #define BOOT1_Pin GPIO_PIN_2

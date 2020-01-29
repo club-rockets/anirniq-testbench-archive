@@ -1,6 +1,8 @@
 #include "cmsis_os.h"
 #include "gpio.h"
 
+#include "stdio.h"
+
 #include "main.h"
 #include "app_lcd.h"
 #include "lcd.h"
@@ -18,6 +20,8 @@
 		  .interfaceSize = lcd_size4
   };
 
+extern uint32_t loadcellLSB1;
+extern uint32_t loadcell_kg1;
 
 void tsk_lcd(void*arg)
 {
@@ -26,13 +30,18 @@ void tsk_lcd(void*arg)
 	lcd_write(&lcd1,lcd_data,'a');
 
 	lcd_setMode(&lcd1,1,0,0);
+	uint8_t buff[30] = {0};
 
-    while (1) {
+	while (1) {
     	osDelay(1000);
+    	sprintf(buff,"%lu",loadcellLSB1);
     	lcd_clear(&lcd1);
-        osDelay(1000);
         lcd_setCursor(&lcd1,0,1);
-        lcd_writeString(&lcd1,"hellooo!");
+        lcd_writeString(&lcd1,buff);
+
+    	sprintf(buff,"%lu",loadcell_kg1);
+        lcd_setCursor(&lcd1,0,0);
+        lcd_writeString(&lcd1,buff);
 
     }
 }
