@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/Marc-Andre/Documents/Repos/anirniq/testbench/Inc
+HeaderPath=C:/Users/Marc-Andre/Documents/repos/anirniq/testbench/Inc
 HeaderFiles=gpio.h;FreeRTOSConfig.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;dma.h;sdio.h;ffconf.h;bsp_driver_sd.h;sd_diskio.h;fatfs.h;user_diskio.h;spi.h;
-SourcePath=C:/Users/Marc-Andre/Documents/Repos/anirniq/testbench/Src
+SourcePath=C:/Users/Marc-Andre/Documents/repos/anirniq/testbench/Src
 SourceFiles=gpio.c;freertos.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;dma.c;sdio.c;bsp_driver_sd.c;sd_diskio.c;fatfs.c;user_diskio.c;spi.c;
 
 [PreviousLibFiles]

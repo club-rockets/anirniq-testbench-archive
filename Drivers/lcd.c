@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lcd.h"
+#include "cmsis_os.h"
 
 void lcd_init(lcd_struct_t* lcd){
 
@@ -143,7 +144,7 @@ void lcd_clear(lcd_struct_t* lcd){
 	osDelay(50);
 }
 
-void lcd_writeString(lcd_struct_t* lcd,uint8_t* str){
+void lcd_writeString(lcd_struct_t* lcd,char* str){
 	uint32_t i = 0;
 	for(;str[i];i++){
 		lcd_write(lcd,lcd_data,str[i]);

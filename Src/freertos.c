@@ -52,6 +52,8 @@ osThreadId defaultTaskHandle;
 osThreadId tskBlinkHandle;
 osThreadId app_SDHandle;
 osThreadId lcdHandle;
+osThreadId loadcellHandle;
+osMutexId loadcellMutexHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -62,6 +64,7 @@ void StartDefaultTask(void const * argument);
 extern void app_blink(void const * argument);
 extern void tsk_SD(void const * argument);
 extern void tsk_lcd(void const * argument);
+extern void tsk_loadcell(void const * argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -91,6 +94,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
        
   /* USER CODE END Init */
+
+  /* Create the mutex(es) */
+  /* definition and creation of loadcellMutex */
+  osMutexDef(loadcellMutex);
+  loadcellMutexHandle = osMutexCreate(osMutex(loadcellMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -122,8 +130,12 @@ void MX_FREERTOS_Init(void) {
   app_SDHandle = osThreadCreate(osThread(app_SD), NULL);
 
   /* definition and creation of lcd */
-  osThreadDef(lcd, tsk_lcd, osPriorityIdle, 0, 500);
+  osThreadDef(lcd, tsk_lcd, osPriorityNormal, 0, 500);
   lcdHandle = osThreadCreate(osThread(lcd), NULL);
+
+  /* definition and creation of loadcell */
+  osThreadDef(loadcell, tsk_loadcell, osPriorityNormal, 0, 128);
+  loadcellHandle = osThreadCreate(osThread(loadcell), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
