@@ -3,4 +3,6 @@
 
 void tsk_lcd(void*arg);
 
+void loadcellGet(float* a, float* b, float* c);
+
 #endif

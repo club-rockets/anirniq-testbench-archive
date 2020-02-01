@@ -53,6 +53,7 @@ osThreadId tskBlinkHandle;
 osThreadId app_SDHandle;
 osThreadId lcdHandle;
 osThreadId loadcellHandle;
+osMutexId loadcellMutexHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -93,6 +94,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
        
   /* USER CODE END Init */
+
+  /* Create the mutex(es) */
+  /* definition and creation of loadcellMutex */
+  osMutexDef(loadcellMutex);
+  loadcellMutexHandle = osMutexCreate(osMutex(loadcellMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */

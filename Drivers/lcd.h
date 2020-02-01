@@ -35,6 +35,6 @@ void lcd_setCursor(lcd_struct_t* lcd,uint8_t x,uint8_t y);
 
 void lcd_clear(lcd_struct_t* lcd);
 
-void lcd_writeString(lcd_struct_t* lcd,uint8_t* str);
+void lcd_writeString(lcd_struct_t* lcd,char* str);
 
 #endif //_LCD_H_

@@ -20,8 +20,6 @@
 		  .interfaceSize = lcd_size4
   };
 
-extern uint32_t loadcellLSB1;
-extern uint32_t loadcell_kg1;
 
 void tsk_lcd(void*arg)
 {
@@ -32,16 +30,28 @@ void tsk_lcd(void*arg)
 	lcd_setMode(&lcd1,1,0,0);
 	uint8_t buff[30] = {0};
 
+	float load1 = 0;
+	float load2 = 0;
+	float load3 = 0;
+
+	lcd_clear(&lcd1);
+	lcd_setCursor(&lcd1,0,0);
+	lcd_writeString(&lcd1,"load 1 :        g");
+	lcd_setCursor(&lcd1,0,1);
+	lcd_writeString(&lcd1,"load 2 :        g");
+
 	while (1) {
-    	osDelay(1000);
-    	sprintf(buff,"%lu",loadcellLSB1);
-    	lcd_clear(&lcd1);
-        lcd_setCursor(&lcd1,0,1);
+    	osDelay(500);
+    	loadcellGet(&load1,&load2,&load3);
+
+    	sprintf(buff,"%06lu",(uint32_t)(load1 * 1000.0));
+        lcd_setCursor(&lcd1,9,0);
         lcd_writeString(&lcd1,buff);
 
-    	sprintf(buff,"%lu",loadcell_kg1);
-        lcd_setCursor(&lcd1,0,0);
+    	sprintf(buff,"%06u",(uint32_t)(load2 * 1000.0));
+        lcd_setCursor(&lcd1,9,1);
         lcd_writeString(&lcd1,buff);
+
 
     }
 }

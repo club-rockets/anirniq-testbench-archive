@@ -26,7 +26,6 @@ void HX711_setup()
 
   // Set the clock pin high (IDLE)
 	HX711_CLOCK_HIGH();
-	HX711_CLOCK_HIGH2();
 }
 
 void HX711_wait100ns(uint32_t ns_100)
@@ -46,8 +45,11 @@ void HX711_wait100ns(uint32_t ns_100)
 
 uint32_t HX711_read(uint32_t nb)
 {
-	uint32_t buffer;
-	buffer = 0;
+	union{
+		uint32_t uint;
+		signed val : 24;
+	} buff;
+	buff.uint = 0;
 
 	HX711_CLOCK_LOW();
 
@@ -69,8 +71,8 @@ uint32_t HX711_read(uint32_t nb)
 		HX711_CLOCK_HIGH();
 		HX711_wait100ns(3);
 
-		buffer <<= 1 ;
-		buffer += HX711_DATA_VALUE();
+		buff.uint <<= 1 ;
+		buff.uint += HX711_DATA_VALUE();
 
 		HX711_CLOCK_LOW();
 #ifdef _USING_FREERTOS_
@@ -93,6 +95,81 @@ uint32_t HX711_read(uint32_t nb)
 #endif
 	}
 	//buffer = buffer ^ 0x800000;
+	if(buff.val<0){
+		buff.val = 0-buff.val;
+	}
 
-	return buffer;
+	return buff.uint;
+}
+
+
+uint32_t HX711_read_all(uint32_t* a, uint32_t* b, uint32_t* c){
+	union{
+		uint32_t uint;
+		signed val : 24;
+	} buff[3] = {0};
+
+	uint32_t i = 0;
+
+	HX711_CLOCK_LOW();
+
+	while (HX711_all_ready() == 0){
+#ifdef _USING_FREERTOS_
+		osDelay(1);
+#else
+		:
+#endif
+	}
+
+	HX711_wait100ns(3);
+
+	for (uint8_t i = 0; i < 24; i++)
+	{
+#ifdef _USING_FREERTOS_
+		taskENTER_CRITICAL();
+#endif
+		HX711_CLOCK_HIGH();
+		HX711_wait100ns(3);
+
+		buff[0].uint <<= 1 ;
+		buff[0].uint += HX711_DATA_VALUE();
+
+		buff[1].uint <<= 1 ;
+		buff[1].uint += HX711_DATA_VALUE2();
+
+		buff[2].uint <<= 1 ;
+		buff[2].uint += HX711_DATA_VALUE3();
+
+		HX711_CLOCK_LOW();
+#ifdef _USING_FREERTOS_
+		taskEXIT_CRITICAL();
+#endif
+		HX711_wait100ns(3);
+	}
+
+	for (uint8_t i = 0; i < 1; i++)
+	{
+#ifdef _USING_FREERTOS_
+		taskENTER_CRITICAL();
+#endif
+		HX711_CLOCK_HIGH();
+		HX711_wait100ns(3);
+		HX711_CLOCK_LOW();
+		HX711_wait100ns(3);
+#ifdef _USING_FREERTOS_
+		taskEXIT_CRITICAL();
+#endif
+	}
+
+	for(i=0;i<3;i++){
+		if(buff[i].val<0){
+			buff[i].val = 0-buff[i].val;
+		}
+	}
+
+	*a = buff[0].uint;
+	*b = buff[1].uint;
+	*c = buff[2].uint;
+
+	return 1;
 }
