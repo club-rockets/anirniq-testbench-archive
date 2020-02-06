@@ -33,6 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "enums.h"
+#include "stm32f407xx.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -67,6 +68,12 @@ void Error_Handler(void);
 #define loadcell_clk_GPIO_Port GPIOE
 #define PH1_OSC_OUT_Pin GPIO_PIN_1
 #define PH1_OSC_OUT_GPIO_Port GPIOH
+#define PRESSURE1_Pin GPIO_PIN_1
+#define PRESSURE1_GPIO_Port GPIOA
+#define PRESSURE2_Pin GPIO_PIN_2
+#define PRESSURE2_GPIO_Port GPIOA
+#define PRESSURE3_Pin GPIO_PIN_3
+#define PRESSURE3_GPIO_Port GPIOA
 #define BOOT1_Pin GPIO_PIN_2
 #define BOOT1_GPIO_Port GPIOB
 #define SD_CS_Pin GPIO_PIN_12
