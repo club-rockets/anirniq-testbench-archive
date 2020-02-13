@@ -44,11 +44,11 @@ void tsk_lcd(void*arg)
     	osDelay(500);
     	loadcellGet(&load1,&load2,&load3);
 
-    	sprintf(buff,"%06lu",(uint32_t)(load1 * 1000.0));
+    	sprintf(buff,"%06ld",(int32_t)(load1 * 1000.0));
         lcd_setCursor(&lcd1,9,0);
         lcd_writeString(&lcd1,buff);
 
-    	sprintf(buff,"%06u",(uint32_t)(load2 * 1000.0));
+    	sprintf(buff,"%06ld",(int32_t)(load2 * 1000.0));
         lcd_setCursor(&lcd1,9,1);
         lcd_writeString(&lcd1,buff);
 
