@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
 #include "app_sd.h"
+#include "bsp_can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +47,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+osMessageQId rxRegsHandle;
 
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
@@ -53,6 +55,7 @@ osThreadId tskBlinkHandle;
 osThreadId app_SDHandle;
 osThreadId lcdHandle;
 osThreadId loadcellHandle;
+osThreadId app_receiveRegHandle;
 osMutexId loadcellMutexHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,6 +68,7 @@ extern void app_blink(void const * argument);
 extern void tsk_SD(void const * argument);
 extern void tsk_lcd(void const * argument);
 extern void tsk_loadcell(void const * argument);
+extern void tsk_receiveReg(void const * argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -114,6 +118,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
+  osMessageQDef(rxRegs, 16, can_reg_t*);
+  rxRegsHandle = osMessageCreate(osMessageQ(rxRegs), NULL);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -136,6 +142,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of loadcell */
   osThreadDef(loadcell, tsk_loadcell, osPriorityNormal, 0, 128);
   loadcellHandle = osThreadCreate(osThread(loadcell), NULL);
+
+  /* definition and creation of app_receiveReg */
+  osThreadDef(app_receiveReg, tsk_receiveReg, osPriorityNormal, 0, 128);
+  app_receiveRegHandle = osThreadCreate(osThread(app_receiveReg), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

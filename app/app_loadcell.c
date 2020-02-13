@@ -57,7 +57,7 @@ void tsk_loadcell(void*arg)
 		osMutexRelease(loadcellMutexHandle);
 		//repeat
 
-		osDelay(10);
+		osDelay(20);
 
     }
 }
