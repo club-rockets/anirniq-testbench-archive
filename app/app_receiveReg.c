@@ -64,7 +64,7 @@ void tsk_receiveReg(void const * argument){
 					if (can_canSetAnyRegisterData(packetBuff.packet.node,\
 							packetBuff.packet.message_id,\
 							(can_regData_u*)(&(packetBuff.packet.payload)),\
-							(packetBuff.packet.node == COMMUNICATION)) ){
+							(packetBuff.packet.node == BENCHTEST)) ){
 						//send confirmation to the base station
 						regConf.reg.board = packetBuff.packet.node;
 						regConf.reg.id = packetBuff.packet.message_id;

@@ -75,8 +75,7 @@ Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
 Middlewares/Third_Party/FatFs/src/option/syscall.c \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c \
 ../shared/bsp/bsp_can_regdef.c \
-../shared/bsp/bsp_can.c \
-../shared/drivers/can/can_driver.c \
+bsp/bsp_can_testbench.c \
 Src/spi.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 Drivers/fatfs_sd.c \

@@ -4,3 +4,4 @@
 .code_review_properties
 /build
 *.launch
+.vscode/
