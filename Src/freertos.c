@@ -57,6 +57,7 @@ osThreadId lcdHandle;
 osThreadId loadcellHandle;
 osThreadId app_receiveRegHandle;
 osThreadId regTransmitHandle;
+osThreadId appThermocoupleHandle;
 osMutexId loadcellMutexHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,6 +72,7 @@ extern void tsk_lcd(void const * argument);
 extern void tsk_loadcell(void const * argument);
 extern void tsk_receiveReg(void const * argument);
 extern void tsk_transmitReg(void const * argument);
+extern void tsk_thermocouple(void const * argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -152,6 +154,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of regTransmit */
   osThreadDef(regTransmit, tsk_transmitReg, osPriorityNormal, 0, 128);
   regTransmitHandle = osThreadCreate(osThread(regTransmit), NULL);
+
+  /* definition and creation of appThermocouple */
+  osThreadDef(appThermocouple, tsk_thermocouple, osPriorityNormal, 0, 128);
+  appThermocoupleHandle = osThreadCreate(osThread(appThermocouple), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
