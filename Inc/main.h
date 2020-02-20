@@ -68,11 +68,11 @@ void Error_Handler(void);
 #define loadcell_clk_GPIO_Port GPIOE
 #define PH1_OSC_OUT_Pin GPIO_PIN_1
 #define PH1_OSC_OUT_GPIO_Port GPIOH
-#define PRESSURE1_Pin GPIO_PIN_1
+#define PRESSURE1_Pin GPIO_PIN_5
 #define PRESSURE1_GPIO_Port GPIOA
-#define PRESSURE2_Pin GPIO_PIN_2
+#define PRESSURE2_Pin GPIO_PIN_6
 #define PRESSURE2_GPIO_Port GPIOA
-#define PRESSURE3_Pin GPIO_PIN_3
+#define PRESSURE3_Pin GPIO_PIN_7
 #define PRESSURE3_GPIO_Port GPIOA
 #define BOOT1_Pin GPIO_PIN_2
 #define BOOT1_GPIO_Port GPIOB

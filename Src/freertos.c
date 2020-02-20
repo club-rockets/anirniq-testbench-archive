@@ -53,6 +53,7 @@ osThreadId tskBlinkHandle;
 osThreadId app_SDHandle;
 osThreadId lcdHandle;
 osThreadId loadcellHandle;
+osThreadId appPressureHandle;
 osMutexId loadcellMutexHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,6 +66,7 @@ extern void app_blink(void const * argument);
 extern void tsk_SD(void const * argument);
 extern void tsk_lcd(void const * argument);
 extern void tsk_loadcell(void const * argument);
+extern void tsk_pressure(void const * argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -136,6 +138,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of loadcell */
   osThreadDef(loadcell, tsk_loadcell, osPriorityNormal, 0, 128);
   loadcellHandle = osThreadCreate(osThread(loadcell), NULL);
+
+  /* definition and creation of appPressure */
+  osThreadDef(appPressure, tsk_pressure, osPriorityNormal, 0, 128);
+  appPressureHandle = osThreadCreate(osThread(appPressure), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
